@@ -88,14 +88,23 @@ class StatsView @JvmOverloads constructor(
         var startAngle = -90F
         val dataSum = data.sum()
         var actualSum = 0F
+        var firstArcColor = 0
+        var firstAngle = 0F
         data.forEachIndexed { index, datum ->
             val fraction = datum / dataSum
             val angle = fraction * 360
             actualSum += fraction
             paint.color = colors.getOrElse(index) { generateRandomColor() }
+            if (index == 0) {
+                firstArcColor = paint.color
+                firstAngle = angle
+            }
             canvas.drawArc(oval, startAngle, angle, false, paint)
             startAngle += angle
         }
+
+        paint.color = firstArcColor
+        canvas.drawArc(oval, -90F, firstAngle / 4, false, paint)
 
         canvas.drawText(
             "%.2f%%".format(actualSum * 100),
