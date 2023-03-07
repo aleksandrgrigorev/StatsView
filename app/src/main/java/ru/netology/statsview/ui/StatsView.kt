@@ -1,6 +1,5 @@
 package ru.netology.statsview.ui
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -8,7 +7,6 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
 import ru.netology.statsview.R
 import ru.netology.statsview.utils.AndroidUtils
@@ -28,9 +26,6 @@ class StatsView @JvmOverloads constructor(
     private var lineWidth = AndroidUtils.dp(context, 5)
     private var textSize = AndroidUtils.dp(context, 20).toFloat()
     private var colors = emptyList<Int>()
-
-    private var progress = 0F
-    private var valueAnimator: ValueAnimator? = null
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
@@ -60,10 +55,15 @@ class StatsView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
     }
 
-    var data: List<Float> = emptyList()
+    var data: List<Float> = listOf(
+        500F,
+        500F,
+        500F,
+        500F,
+    )
         set(value) {
             field = value
-            update()
+            invalidate()
         }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -80,7 +80,7 @@ class StatsView @JvmOverloads constructor(
             return
         }
 
-        var startAngle = -90F + progress * 360
+        var startAngle = -90F
         val dataSum = data.sum()
         var actualSum = 0F
         var firstArcColor = 0
@@ -94,7 +94,7 @@ class StatsView @JvmOverloads constructor(
                 firstArcColor = paint.color
                 firstAngle = angle
             }
-            canvas.drawArc(oval, startAngle, angle * progress, false, paint)
+            canvas.drawArc(oval, startAngle, angle, false, paint)
             startAngle += angle
         }
 
@@ -107,25 +107,6 @@ class StatsView @JvmOverloads constructor(
             center.y + textPaint.textSize / 4,
             textPaint
         )
-    }
-
-    private fun update() {
-        valueAnimator?.let {
-            it.removeAllListeners()
-            it.cancel()
-        }
-        progress = 0F
-
-        valueAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
-            addUpdateListener { anim ->
-                progress = anim.animatedValue as Float
-                invalidate()
-            }
-            duration = 3000
-            interpolator = LinearInterpolator()
-        }.also {
-            it.start()
-        }
     }
 
     private fun generateRandomColor() = Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
