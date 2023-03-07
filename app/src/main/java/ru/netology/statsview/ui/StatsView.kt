@@ -18,12 +18,10 @@ class StatsView @JvmOverloads constructor(
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
-) : View(
-    context,
-    attributeSet,
-    defStyleAttr,
-    defStyleRes,
-) {
+) : View(context, attributeSet, defStyleAttr, defStyleRes,) {
+    private var radius = 0F
+    private var center = PointF()
+    private var oval = RectF()
 
     private var textSize = AndroidUtils.dp(context, 20).toFloat()
     private var lineWidth = AndroidUtils.dp(context, 5)
@@ -44,14 +42,6 @@ class StatsView @JvmOverloads constructor(
         }
     }
 
-    var data: List<Float> = emptyList()
-        set(value) {
-            field = value
-            invalidate()
-        }
-    private var radius = 0F
-    private var center = PointF()
-    private var oval = RectF()
     private val paint = Paint(
         Paint.ANTI_ALIAS_FLAG
     ).apply {
@@ -68,6 +58,17 @@ class StatsView @JvmOverloads constructor(
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
     }
+
+    var data: List<Float> = listOf(
+        500F,
+        500F,
+        500F,
+        500F,
+    )
+        set(value) {
+            field = value
+            invalidate()
+        }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         radius = min(w, h) / 2F - lineWidth
